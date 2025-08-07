@@ -1,0 +1,108 @@
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #f7f7fa;
+  color: #333;
+}
+
+/* Section Styling */
+section {
+  background-color: #fff;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Admin Profile */
+.adminprofile h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.adminprofile p {
+  margin-bottom: 5px;
+}
+
+/* Form Styling */
+form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+form select,
+form textarea,
+form input[type="file"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.postsubmit {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.postsubmit:hover {
+  background-color: #0056b3;
+}
+
+/* Post History */
+#history {
+  margin-top: 10px;
+}
+
+#history div {
+  background-color: #fafafa;
+  padding: 10px;
+  border-left: 4px solid #007bff;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+#history img {
+  max-width: 100%;
+  height: auto;
+  margin-top: 5px;
+  border-radius: 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  section {
+    padding: 15px;
+  }
+
+  .adminprofile h2 {
+    font-size: 1.3em;
+  }
+
+  .postsubmit {
+    width: 100%;
+  }
+}

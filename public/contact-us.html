@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="hi-IN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <style>
+        /* Basic Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Container for the form */
+        .contact-container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 15px;
+        }
+
+        .intro-text {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* Styling for each form field group */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box; /* To include padding in width */
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* CAPTCHA specific styles */
+        .captcha-group label {
+            display: flex;
+            align-items: center;
+        }
+
+        #captcha-question {
+            font-weight: bold;
+            color: #d9534f;
+            margin-left: 10px;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* For success/error messages */
+        #form-message {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: none; /* Hidden by default */
+        }
+        #form-message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        #form-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="contact-container">
+        <h1>Contact-US</h1>
+        <p class="intro-text">
+            For your suggestions, questions or any other information, please fill the form below. We will get back to you as soon as possible.
+        </p>
+
+        <div id="form-message"></div>
+
+        <form id="contactForm" action="https://formspree.io/f/xyzpnred" method="POST">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Subect</label>
+                <input type="text" id="subject" name="subject" required>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" required></textarea>
+            </div>
+
+            <div class="form-group captcha-group">
+                <label for="captcha">Verify I'm Human<span id="captcha-question"></span></label>
+                <input type="number" id="captcha" name="captcha" placeholder="उत्तर यहाँ लिखें" required>
+            </div>
+
+            <button type="submit" class="submit-btn">Send Message</button>
+        </form>
+    </main>
+
+    <script>
+        // Global variable to store the correct CAPTCHA answer
+        let correctAnswer;
+
+        // Function to generate a new CAPTCHA question
+        function generateCaptcha() {
+            const num1 = Math.floor(Math.random() * 10) + 1; // Random number 1-10
+            const num2 = Math.floor(Math.random() * 10) + 1; // Random number 1-10
+            correctAnswer = num1 + num2;
+            document.getElementById('captcha-question').textContent = `${num1} + ${num2} = ?`;
+        }
+
+        // This function runs when the form is submitted
+        function handleFormSubmit(event) {
+            // Prevent the form from actually submitting to a server
+            event.preventDefault();
+
+            const messageDiv = document.getElementById('form-message');
+            const userAnswer = parseInt(document.getElementById('captcha').value, 10);
+
+            // Check if the user's answer is correct
+            if (userAnswer !== correctAnswer) {
+                // If wrong, show an error message
+                messageDiv.textContent = 'गलत सुरक्षा उत्तर! कृपया दोबारा प्रयास करें।';
+                messageDiv.className = 'error';
+                messageDiv.style.display = 'block';
+                generateCaptcha(); // Generate a new question
+            } else {
+                // If correct, show a success message
+                messageDiv.textContent = 'धन्यवाद! आपका संदेश सफलतापूर्वक भेज दिया गया है।';
+                messageDiv.className = 'success';
+                messageDiv.style.display = 'block';
+
+                // --- IMPORTANT NOTE ---
+                // In a real website, this is where you would send the form data to a server using fetch().
+                // For this example, we will just reset the form.
+                
+                document.getElementById('contactForm').reset(); // Clear the form
+                generateCaptcha(); // Generate a new question for the next time
+            }
+        }
+
+        // Wait for the page to load completely before running scripts
+        document.addEventListener('DOMContentLoaded', () => {
+            generateCaptcha(); // Generate the first CAPTCHA question
+            const form = document.getElementById('contactForm');
+            form.addEventListener('submit', handleFormSubmit); // Attach the submit handler
+        });
+    </script>
+
+</body>
+</html>
