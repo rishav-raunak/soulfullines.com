@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Create a Post</title>
+  <link rel="stylesheet" href="user-dashboard.css">
+</head>
+
+<body>
+
+  <!-- 👤 User Info Section -->
+  <section class="adminprofile">
+    <h2>Welcome, <%= user.name %> 👋</h2>
+    <p><strong>Email:</strong>
+      <%= user.email %>
+    </p>
+    <p><strong>Role:</strong>
+      <%= user.role %>
+    </p>
+  </section>
+
+  <!-- 📝 Post Form Section -->
+  <section>
+    <h2>Create a Post</h2>
+
+    <form id="postForm" enctype="multipart/form-data">
+      <!-- Select Tag -->
+      <label>Tag:</label>
+      <select name="tag" id="tag">
+        <option value="motivation">Motivation</option>
+        <option value="love">Love</option>
+        <option value="quotes">Quotes</option>
+        <option value="sad">Sad</option>
+        <!-- <option value="laughing">Laughing</option> -->
+      </select>
+
+      <!-- Select Type -->
+      <label>Type:</label>
+      <select name="type" id="type">
+        <option value="text">Text</option>
+        <option value="image">Image</option>
+      </select>
+
+      <!-- Text or Image Input -->
+      <div id="textInput">
+        <textarea name="content" placeholder="Write something..."></textarea>
+      </div>
+
+      <div id="imageInput" style="display: none;">
+        <input type="file" name="image">
+      </div>
+
+      <button type="submit" class="postsubmit">Post</button>
+    </form>
+  </section>
+
+  <!-- 🕒 Post History Section -->
+  <!-- <section>
+    <h3>Your Post History</h3>
+    <div id="history"></div>
+    <div id="pagination-controls" class="pagination-controls">
+      <button id="prevBtn" disabled>Previous</button>
+      <span id="pageInfo">Page 1</span>
+      <button id="nextBtn">Next</button>
+    </div>
+  </section> -->
+  <script>
+    const typeSelect = document.getElementById('type');
+    const textInput = document.getElementById('textInput');
+    const imageInput = document.getElementById('imageInput');
+    const historyContainer = document.getElementById('history');
+    const postForm = document.getElementById('postForm');
+
+    typeSelect.addEventListener('change', () => {
+      if (typeSelect.value === 'text') {
+        textInput.style.display = 'block';
+        imageInput.style.display = 'none';
+      } else {
+        textInput.style.display = 'none';
+        imageInput.style.display = 'block';
+      }
+    });
+
+    document.getElementById('postForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(document.getElementById('postForm'));
+
+      await fetch('/add-post', {
+        method: 'POST',
+        body: formData,
+      });
+
+      alert('Post uploaded');
+      location.reload();
+    });
+
+    // Show history
+    let currentPage = 1;
+    const postsPerPage = 5; // Ek page par 5 posts dikhayein
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageInfo = document.getElementById('pageInfo');
+
+    async function fetchPosts(page) {
+      try {
+        const res = await fetch(`/all-posts?page=${page}&limit=${postsPerPage}`);
+        const data = await res.json();
+
+        // --- YEH HAI IMPORTANT SAFETY CHECK ---
+        // Pehle check karein ki 'data' aur 'data.posts' मौजूद hain ya nahi
+        if (data && data.posts) {
+
+          // Ab aapka purana code yahan safe hai
+          historyContainer.innerHTML = '';
+
+          if (data.posts.length === 0 && page > 1) {
+            // Agar page par koi post nahi hai, to pichle page par jayein
+            currentPage--;
+            fetchPosts(currentPage);
+            return;
+          }
+
+          data.posts.map(p => {
+            const postElement = document.createElement('div');
+            postElement.className = 'post-item';
+            postElement.innerHTML = `
+                    <strong>${p.tag} (${p.type})</strong><br>
+                    ${p.type === 'text' ? p.content : `<img src="/uploads/${p.content}" width="100">`}
+                    <button class="delete-btn" data-id="${p.id}">Delete</button> 
+                `;
+            historyContainer.appendChild(postElement);
+          });
+
+          pageInfo.textContent = `Page ${data.currentPage}`;
+          prevBtn.disabled = !data.hasPrevPage;
+          nextBtn.disabled = !data.hasNextPage;
+
+        } else {
+          // Agar backend se error aaya ya data format galat hai
+          console.error('Backend se posts fetch nahi ho paye ya data format galat hai:', data);
+          historyContainer.innerHTML = `<p style="color: red;">Post history load nahi ho saki. Server error: ${data.message || 'Unknown error'}</p>`;
+        }
+      } catch (error) {
+        console.error("Fetch operation mein problem aayi:", error);
+        historyContainer.innerHTML = '<p style="color: red;">Post history load karte samay network error.</p>';
+      }
+    }
+
+    // Pagination button clicks
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        fetchPosts(currentPage);
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      currentPage++;
+      fetchPosts(currentPage);
+    });
+
+    // --- DELETE LOGIC ---
+    historyContainer.addEventListener('click', async (e) => {
+      // Check karein ki delete button click hua hai ya nahi
+      if (e.target.classList.contains('delete-btn')) {
+        const postId = e.target.getAttribute('data-id');
+
+        // User se confirmation lein
+        const confirmed = confirm('Are you sure you want to delete this post?');
+
+        if (confirmed) {
+          try {
+            const response = await fetch(`/delete-post/${postId}`, {
+              method: 'DELETE',
+            });
+
+            if (response.ok) {
+              alert('Post deleted successfully!');
+              fetchPosts(currentPage); // Current page ko refresh karein
+            } else {
+              alert('Failed to delete post.');
+            }
+          } catch (error) {
+            console.error('Error deleting post:', error);
+            alert('An error occurred.');
+          }
+        }
+      }
+    });
+
+    // Initial fetch jab page load ho
+    fetchPosts(currentPage);
+  </script>
+</body>
+
+</html>
