@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <h1 class="adminprofile">Admin Dashboard</h1>
+
+  <!-- Admin Profile Section -->
+  <section class="adminprofile">
+    <h2>Profile</h2>
+    <p><strong>Name:</strong> <%= admin.name %></p>
+    <p><strong>Email:</strong> <%= admin.email %></p>
+    <p><strong>Role:</strong> <%= admin.role %></p>
+
+    <form action="/admin/update-bio" method="POST">
+      <label for="bio">Bio:</label><br>
+      <textarea name="bio" rows="3" cols="30"><%= admin.bio %></textarea><br>
+      <button type="submit">Update Bio</button>
+    </form>
+  </section>
+
+  <hr>
+
+  <!-- User Management Table -->
+  <section>
+    <h2>All Users</h2>
+    <table border="1" cellpadding="5">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Posts</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(user => { %>
+          <tr>
+            <td><%= user.name %></td>
+            <td><%= user.email %></td>
+            <td><%= user.role %></td>
+            <td><%= user.postCount %></td>
+            <td>
+              <% if (user.role !== 'admin') { %>
+                <form action="/admin/promote" method="POST" style="display:inline;">
+                  <input type="hidden" name="userId" value="<%= user.id %>">
+                  <button type="submit">Make Admin</button>
+                </form>
+              <% } %>
+
+              <% if (!user.isBlocked) { %>
+                <form action="/admin/block" method="POST" style="display:inline;">
+                  <input type="hidden" name="userId" value="<%= user.id %>">
+                  <button type="submit">Block</button>
+                </form>
+              <% } else { %>
+                <em>Blocked</em>
+              <% } %>
+
+              <form action="/admin/delete-posts" method="POST" style="display:inline;">
+                <input type="hidden" name="userId" value="<%= user.id %>">
+                <button type="submit">Delete Posts</button>
+              </form>
+
+              <% if (admin.master && user.role !== 'admin') { %>
+                <form action="/admin/delete-user" method="POST" style="display:inline;">
+                  <input type="hidden" name="userId" value="<%= user.id %>">
+                  <button type="submit">Delete User</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </section>
+</body>
+</html>
+
+
+
+
+<!-- 
+this line add in app.js<--res.render('admin-dashboard', {
+  admin: req.user, // current admin
+  users: allUsersWithPostCounts
+});--> 
+
+
+
