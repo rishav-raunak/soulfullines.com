@@ -56,7 +56,7 @@
   </section>
 
   <!-- 🕒 Post History Section -->
-  <!-- <section>
+   <section>
     <h3>Your Post History</h3>
     <div id="history"></div>
     <div id="pagination-controls" class="pagination-controls">
@@ -64,7 +64,7 @@
       <span id="pageInfo">Page 1</span>
       <button id="nextBtn">Next</button>
     </div>
-  </section> -->
+  </section> 
   <script>
     const typeSelect = document.getElementById('type');
     const textInput = document.getElementById('textInput');
@@ -98,7 +98,7 @@
 
     // Show history
     let currentPage = 1;
-    const postsPerPage = 5; // Ek page par 5 posts dikhayein
+    const postsPerPage = 8; // Ek page par 5 posts dikhayein
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const pageInfo = document.getElementById('pageInfo');
@@ -194,5 +194,6 @@
     fetchPosts(currentPage);
   </script>
 </body>
+
 
 </html>
